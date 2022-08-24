@@ -4,7 +4,9 @@ const { User } = require("../../models");
 // GET /api/users
 router.get("/", (req, res) => {
 	// Access our User model and run .findAll() method) .findAll() equal to SQL <SELECT * FROM users;>
-	User.findAll()
+	User.findAll({
+		attributes: { exclude: ["password"] },
+	})
 		.then((dbUserData) => res.json(dbUserData))
 		.catch((err) => {
 			console.log(err);
@@ -15,6 +17,7 @@ router.get("/", (req, res) => {
 // GET /api/users/1
 router.get("/:id", (req, res) => {
 	User.findOne({
+		attributes: { exclude: ["password"] },
 		//similar to the SQL <SELECT * FROM users WHERE id = 1>
 		where: {
 			id: req.params.id,
@@ -55,7 +58,7 @@ router.put("/:id", (req, res) => {
 
 	// if req.body has exact key/value pairs to match the model, you can just use `req.body` instead
 
-    //Replaces UPDATE...SET...WHERE... in SQL
+	//Replaces UPDATE...SET...WHERE... in SQL
 	User.update(req.body, {
 		where: {
 			id: req.params.id,
@@ -76,22 +79,22 @@ router.put("/:id", (req, res) => {
 
 // DELETE /api/users/1
 router.delete("/:id", (req, res) => {
-    User.destroy({
-        where: {
-          id: req.params.id
-        }
-      })
-        .then(dbUserData => {
-          if (!dbUserData) {
-            res.status(404).json({ message: 'No user found with this id' });
-            return;
-          }
-          res.json(dbUserData);
-        })
-        .catch(err => {
-          console.log(err);
-          res.status(500).json(err);
-        });
+	User.destroy({
+		where: {
+			id: req.params.id,
+		},
+	})
+		.then((dbUserData) => {
+			if (!dbUserData) {
+				res.status(404).json({ message: "No user found with this id" });
+				return;
+			}
+			res.json(dbUserData);
+		})
+		.catch((err) => {
+			console.log(err);
+			res.status(500).json(err);
+		});
 });
 
 module.exports = router;
