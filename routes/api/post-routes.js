@@ -1,10 +1,11 @@
 const router = require("express").Router();
 const sequelize = require("../../config/connection");
-const { User, Post, Vote } = require("../../models");
+const { User, Post, Vote, Comment } = require("../../models");
 
 // get all users
 router.get("/", (req, res) => {
 	Post.findAll({
+		order: [["created_at", "DESC"]],
 		attributes: [
 			"id",
 			"post_url",
@@ -17,9 +18,17 @@ router.get("/", (req, res) => {
 				"vote_count",
 			],
 		],
-		order: [["created_at", "DESC"]],
-		//include property is like JOIN in SQL
+		//include Comment model
 		include: [
+			{
+				model: Comment,
+				attributes: ["id", "comment_text", "post_id", "user_id", "created_at"],
+				include: {
+					model: User,
+					attributes: ["username"],
+				},
+			},
+
 			{
 				model: User,
 				attributes: ["username"],
@@ -52,6 +61,15 @@ router.get("/:id", (req, res) => {
 			],
 		],
 		include: [
+			{
+				model: Comment,
+				attributes: ["id", "comment_text", "post_id", "user_id", "created_at"],
+				include: {
+					model: User,
+					attributes: ["username"],
+				},
+			},
+
 			{
 				model: User,
 				attributes: ["username"],
